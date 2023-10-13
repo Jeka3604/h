@@ -1,2 +1,131 @@
-warn("TEST")
-print("hello, test for linksource")
+-- Jeka's LOOPBRING
+local GGGG = Instance.new("ScreenGui")
+local TextBox = Instance.new("TextBox")
+local lb = Instance.new("TextButton")
+local unlb = Instance.new("TextButton")
+
+GGGG.Name = "GGGG"
+GGGG.ResetOnSpawn = false
+GGGG.IgnoreGuiInset = true
+GGGG.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+_G.GlobalGuiUI1 = GGGG
+GGGG.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+TextBox.Parent = GGGG
+TextBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TextBox.Position = UDim2.new(0.314624518, 0, 0.0209876541, 0)
+TextBox.Size = UDim2.new(0.158102766, 0, 0.0901234597, 0)
+TextBox.Font = Enum.Font.SourceSans
+TextBox.PlaceholderText = "name"
+TextBox.Text = ""
+TextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+TextBox.TextScaled = true
+TextBox.TextSize = 14.000
+TextBox.TextWrapped = true
+
+lb.Name = "lb"
+lb.Parent = GGGG
+lb.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+lb.BorderColor3 = Color3.fromRGB(0, 0, 0)
+lb.Position = UDim2.new(0.314624518, 0, 0.111111112, 0)
+lb.Size = UDim2.new(0.0703557283, 0, 0.0814814791, 0)
+lb.Font = Enum.Font.SourceSans
+lb.Text = "ON"
+lb.TextColor3 = Color3.fromRGB(0, 0, 0)
+lb.TextScaled = true
+lb.TextSize = 14.000
+lb.TextWrapped = true
+
+unlb.Name = "unlb"
+unlb.Parent = GGGG
+unlb.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+unlb.BorderColor3 = Color3.fromRGB(0, 0, 0)
+unlb.Position = UDim2.new(0.402371556, 0, 0.111111112, 0)
+unlb.Size = UDim2.new(0.0703557283, 0, 0.0814814791, 0)
+unlb.Font = Enum.Font.SourceSans
+unlb.Text = "OFF"
+unlb.TextColor3 = Color3.fromRGB(0, 0, 0)
+unlb.TextScaled = true
+unlb.TextSize = 14.000
+unlb.TextWrapped = true
+
+local function YVHW_fake_script() 
+	local script = Instance.new('LocalScript', GGGG)
+
+	local txt = script.Parent.TextBox
+	local lb  = script.Parent.lb
+	local unloop = script.Parent.unlb
+	local runservice=game:GetService("RunService")
+	
+	local _playername = "nil"
+	
+	local waitfor_players = {};
+	local players = {};
+	
+	game.Players.PlayerAdded:Connect(function(plr)
+		if table.find(waitfor_players,plr.Name) then
+			table.remove(waitfor_players,table.find(waitfor_players,plr.Name))
+			table.insert(players,plr.Name)
+		end
+	end)
+	
+	game.Players.PlayerRemoving:Connect(function(plr)
+		if table.find(players,plr.Name) then
+			table.remove(players,table.find(players,plr.Name))
+			table.insert(waitfor_players,plr.Name)
+		end
+	end)
+	
+	txt.FocusLost:Connect(function()
+	
+		local message = txt.Text
+	
+		for i, v in pairs(game.Players:GetChildren()) do
+			if string.find(string.lower(v.Name), string.lower(message)) and v.Name~=game.Players.LocalPlayer.Name and txt.Text~="" then 
+				if message == string.lower(game.Players.LocalPlayer.Name) then
+					txt.Text = "error"
+					txt.TextEditable = false
+					task.wait(1)
+					txt.Text = ""
+					txt.TextEditable = true
+					
+				else
+					txt.Text = v.Name.." ("..v.DisplayName..")"
+					_playername = v.Name
+				end
+			end
+		end
+	end)
+	
+	lb.MouseButton1Click:Connect(function()
+		if game.Players:FindFirstChild(_playername) then
+			table.insert(players,_playername)
+		end
+	end)
+	
+	unloop.MouseButton1Click:Connect(function()
+		if table.find(players,_playername) then
+			table.remove(players,table.find(players,_playername))
+			game.Players:FindFirstChild(_playername).Character:FindFirstChild("HumanoidRootPart").Anchored = false
+		end
+	end)
+	
+	runservice.Heartbeat:Connect(function()
+		if #players == 0 then return end
+		for i,_name:string in pairs(players) do
+			local player:Player = game.Players:FindFirstChild(_name)
+			if player then
+				if player.Character~=nil then
+					local hroot:Part = player.Character:FindFirstChild("HumanoidRootPart")
+					if hroot then
+						local clientHroot = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+						hroot.Anchored = true
+						hroot.CFrame = clientHroot.CFrame+clientHroot.CFrame.LookVector*3
+					end
+				end
+			end
+		end
+	end)
+end
+coroutine.wrap(YVHW_fake_script)()
